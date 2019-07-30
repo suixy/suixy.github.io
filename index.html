@@ -212,39 +212,9 @@
 </ul>
 <p>每一个Java线程都有一个PC寄存器，每一个Java线程总是在执行一个方法，如果当前的方法是Java方法，那么PC寄存器的内容为方法对应的指令，如果是本地方法，那么是undefined.</p>
 <hr>
-<h3 id="Java堆初探"><a href="#Java堆初探" class="headerlink" title="Java堆初探"></a>Java堆初探</h3><p>一百来说，不同的垃圾回收机制下，Java堆的结构不尽相同，一种常见的结构是将整个Java堆分成<strong><em>新生代，老年代</em></strong>两种，新生代用于存放新生对象或者年龄不大的对象，分为<strong><em>eden区，s0区，s1区</em></strong> ，s0区s1区有时也被称为from区，to区。</p>
-<hr>
-<h2 id="第十章Class装载系统"><a href="#第十章Class装载系统" class="headerlink" title="第十章Class装载系统"></a>第十章Class装载系统</h2><h3 id="系统中的类加载器"><a href="#系统中的类加载器" class="headerlink" title="系统中的类加载器"></a>系统中的类加载器</h3><ul>
-<li><p>启动类加载器（Bootstrap ClassLoader）</p>
-<p>负责加载<code>&lt;JAVA_HOME&gt;/lib</code>目录，或者被<code>-Xbootclasspath</code>参数指定目录，并且是目录中虚拟机可以识别的类库。</p>
-<p>启动类加载器由C语言编写，无法在Java程序中获取，当需要委派给启动类加载器时，直接使用NULL代替即可。常见的用启动类加载器加载的有String，List以及Main class。</p>
-</li>
-<li><p>扩展类加载器（Extension ClassLoader)</p>
-<p>负责加载<code>&lt;JAVA_HOME&gt;/lib/ext</code>目录，或者被<code>java.ext.dirs</code>系统变量所指定的路径中的所有类库。</p>
-</li>
-<li><p>应用程序类加载器（Application ClassLoader) </p>
-<p>也被成为系统类加载器，是<code>ClassLoader.getSystemClassLoader()</code>方法的返回值，负责加载用户类路径<code>ClassPath</code>上所指定的类库，是程序中默认指定的加载器。</p>
-</li>
-</ul>
-<h3 id="双亲委派模型"><a href="#双亲委派模型" class="headerlink" title="双亲委派模型"></a>双亲委派模型</h3><h4 id="1-双亲委派模型的含义"><a href="#1-双亲委派模型的含义" class="headerlink" title="1. 双亲委派模型的含义"></a>1. 双亲委派模型的含义</h4><ul>
-<li>要求：除了顶层的启动类加载器之外，其余的类加载器都应该有一个父类的加载器。</li>
-</ul>
-<p>工作过程：</p>
-<ul>
-<li><p>当前的类加载器收到类加载的请求（当前类加载器被调用之后），首先向上询问是否已经被加载。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(```)</span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; loadClass(string name, <span class="keyword">boolean</span> resolve)</span><br><span class="line">    &#123;</span><br><span class="line">    	<span class="comment">// First, check if the class has already been loaded</span></span><br><span class="line">            Class&lt;?&gt; c = findLoadedClass(name);</span><br><span class="line">    &#125;</span><br><span class="line">(```)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果已经被加载则直接返回，否则让自己的双亲加载。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">(```)</span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; loadClass(string name, <span class="keyword">boolean</span> resolve)</span><br><span class="line">    &#123;</span><br><span class="line">    	<span class="comment">// 省略的内容</span></span><br><span class="line">           <span class="keyword">try</span> &#123;</span><br><span class="line">               <span class="keyword">if</span> (parent != <span class="keyword">null</span>) &#123;</span><br><span class="line">                   c = parent.loadClass(name, <span class="keyword">false</span>);</span><br><span class="line">               &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                   c = findBootstrapClassOrNull(name);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">           &#125;</span><br><span class="line">     &#125;</span><br><span class="line">(```)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果双亲不能加载（在对应的搜索路径中找不到对应的类）时，自己加载</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">(```)</span><br><span class="line">	<span class="keyword">protected</span> Class&lt;?&gt; loadClass(string name, <span class="keyword">boolean</span> resolve)</span><br><span class="line">    &#123;</span><br><span class="line">    	<span class="comment">// 省略的内容</span></span><br><span class="line">    	<span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// If still not found, then invoke findClass in order</span></span><br><span class="line">           	<span class="comment">// to find the class.</span></span><br><span class="line">            <span class="keyword">long</span> t1 = System.nanoTime();</span><br><span class="line">            c = findClass(name);</span><br><span class="line">        &#125;   </span><br><span class="line">     &#125;</span><br><span class="line">(```)</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>在这种模式下，说明<strong>每一个类的请求都要传递到启动类加载器</strong>，最后在自上而下进行加载。</p>
-<h4 id="2-双亲委派模型的作用"><a href="#2-双亲委派模型的作用" class="headerlink" title="2. 双亲委派模型的作用"></a>2. 双亲委派模型的作用</h4><p>每一个类都要保证其加载的唯一性和类–类加载器的唯一性。虽然这种双亲委派模型看起来很麻烦，每一次都要询问自己的双亲，但是这种模型保证了<strong>每一个类都有专门的加载器进行加载，不会发生混乱（即系统中同时出现多个类的情况）</strong> </p>
-
+        
+          <a class="article-more-a" href="/2019/07/09/《java虚拟机实战》读书笔记/#more">more >></a>
+        
       
       
 
