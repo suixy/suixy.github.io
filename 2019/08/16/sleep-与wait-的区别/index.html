@@ -6,20 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://suixy.github.io">
-  <title>sleep()与wait()的区别 | Hexo</title>
+  <title>sleep()、wait()、yield()的区别 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Java中sleep()与wait()的区别相同点 两个方法都可以使线程”休息“一段时间，使线程从运行态切换到阻塞态。  不同点 sleep()是Thread类的方法，而wait()是Object类的方法。 wait()方法必须应用在被synchronized 关键字修饰的代码块、方法当中，而sleep()可以应用在任意的位置。 当前线程必须在拥有了监视器的条件下，才能调用wait()方法。并且调">
+  <meta name="description" content="sleep()与wait()的区别相同点 两个方法都可以使线程”休息“一段时间，使线程从运行态切换到阻塞态。  不同点 sleep()是Thread类的方法，而wait()是Object类的方法。 wait()方法必须应用在被synchronized 关键字修饰的代码块、方法当中，而sleep()可以应用在任意的位置。 当前线程必须在拥有了监视器的条件下，才能调用wait()方法。并且调用wait">
 <meta name="keywords" content="Java并发">
 <meta property="og:type" content="article">
-<meta property="og:title" content="sleep()与wait()的区别">
+<meta property="og:title" content="sleep()、wait()、yield()的区别">
 <meta property="og:url" content="http://suixy.github.io/2019/08/16/sleep-与wait-的区别/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="Java中sleep()与wait()的区别相同点 两个方法都可以使线程”休息“一段时间，使线程从运行态切换到阻塞态。  不同点 sleep()是Thread类的方法，而wait()是Object类的方法。 wait()方法必须应用在被synchronized 关键字修饰的代码块、方法当中，而sleep()可以应用在任意的位置。 当前线程必须在拥有了监视器的条件下，才能调用wait()方法。并且调">
+<meta property="og:description" content="sleep()与wait()的区别相同点 两个方法都可以使线程”休息“一段时间，使线程从运行态切换到阻塞态。  不同点 sleep()是Thread类的方法，而wait()是Object类的方法。 wait()方法必须应用在被synchronized 关键字修饰的代码块、方法当中，而sleep()可以应用在任意的位置。 当前线程必须在拥有了监视器的条件下，才能调用wait()方法。并且调用wait">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-08-16T07:29:25.758Z">
+<meta property="og:updated_time" content="2019-08-16T08:40:03.011Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="sleep()与wait()的区别">
-<meta name="twitter:description" content="Java中sleep()与wait()的区别相同点 两个方法都可以使线程”休息“一段时间，使线程从运行态切换到阻塞态。  不同点 sleep()是Thread类的方法，而wait()是Object类的方法。 wait()方法必须应用在被synchronized 关键字修饰的代码块、方法当中，而sleep()可以应用在任意的位置。 当前线程必须在拥有了监视器的条件下，才能调用wait()方法。并且调">
+<meta name="twitter:title" content="sleep()、wait()、yield()的区别">
+<meta name="twitter:description" content="sleep()与wait()的区别相同点 两个方法都可以使线程”休息“一段时间，使线程从运行态切换到阻塞态。  不同点 sleep()是Thread类的方法，而wait()是Object类的方法。 wait()方法必须应用在被synchronized 关键字修饰的代码块、方法当中，而sleep()可以应用在任意的位置。 当前线程必须在拥有了监视器的条件下，才能调用wait()方法。并且调用wait">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -162,7 +162,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      sleep()与wait()的区别
+      sleep()、wait()、yield()的区别
     </h1>
   
 
@@ -175,7 +175,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="Java中sleep-与wait-的区别"><a href="#Java中sleep-与wait-的区别" class="headerlink" title="Java中sleep()与wait()的区别"></a>Java中sleep()与wait()的区别</h1><h2 id="相同点"><a href="#相同点" class="headerlink" title="相同点"></a>相同点</h2><ul>
+        <h1 id="sleep-与wait-的区别"><a href="#sleep-与wait-的区别" class="headerlink" title="sleep()与wait()的区别"></a>sleep()与wait()的区别</h1><h2 id="相同点"><a href="#相同点" class="headerlink" title="相同点"></a>相同点</h2><ul>
 <li>两个方法都可以使线程”休息“一段时间，使线程从运行态切换到阻塞态。</li>
 </ul>
 <h2 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h2><ul>
@@ -188,6 +188,13 @@
 <li>等待超时</li>
 </ul>
 </li>
+</ul>
+<a id="more"></a>
+
+<hr>
+<h1 id="sleep-与yield-的区别"><a href="#sleep-与yield-的区别" class="headerlink" title="sleep()与yield()的区别"></a>sleep()与yield()的区别</h1><ul>
+<li><strong>线程调度上：</strong> sleep()方法让当前线程“休息”一段时间，在这段时间内，线程调度器不会调度该线程，而yield()方法线程只是让出自己的时间片，等待线程调度器重新调度。</li>
+<li><strong>线程状态上：</strong> sleep()方法的调用会让线程从运行态切换到阻塞挂起态，休息结束后，重新进入就绪态，yield()方法仅仅是主动让出操作系统分配的CPU时间片，切换到就绪状态，等待线程调度器重新调度，所以存在调用yield()方法后该线程继续运行的情况。</li>
 </ul>
 
       
@@ -342,7 +349,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Java中sleep-与wait-的区别"><span class="toc-number">1.</span> <span class="toc-text">Java中sleep()与wait()的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#相同点"><span class="toc-number">1.1.</span> <span class="toc-text">相同点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不同点"><span class="toc-number">1.2.</span> <span class="toc-text">不同点</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#sleep-与wait-的区别"><span class="toc-number">1.</span> <span class="toc-text">sleep()与wait()的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#相同点"><span class="toc-number">1.1.</span> <span class="toc-text">相同点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不同点"><span class="toc-number">1.2.</span> <span class="toc-text">不同点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#sleep-与yield-的区别"><span class="toc-number">2.</span> <span class="toc-text">sleep()与yield()的区别</span></a></li></ol>
                     </div>
                 </span>
             </div>
@@ -451,15 +458,15 @@
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">Java虚拟机</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java并发</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">数据库</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Java虚拟机</a>
               </li>
              
               <li class="article-tag-list-item">
